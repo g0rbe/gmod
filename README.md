@@ -1,4 +1,4 @@
-# go-gmod
+# gmod
 
 Get:
 ```bash
