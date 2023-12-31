@@ -1,4 +1,4 @@
-package slitu
+package gmod
 
 import (
 	"math/rand"

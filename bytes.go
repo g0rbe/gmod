@@ -1,4 +1,4 @@
-package slitu
+package gmod
 
 // IsDigit returns whether c is a number character ascii code.
 func IsDigit(c byte) bool {
