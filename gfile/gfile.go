@@ -34,6 +34,28 @@ func IsLineInFile(path, s string) (bool, error) {
 	return false, scanner.Err()
 }
 
+// IsStringInFile check whether file path is contains s string.
+// A line in the file does not contains the newline character ("\n").
+// This function uses bufio.Scanner to able to handle large files.
+func IsStringInFile(path, s string) (bool, error) {
+
+	file, err := os.OpenFile(path, os.O_RDONLY, 0644)
+	if err != nil {
+		return false, err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		if scanner.Text() == s {
+			return true, nil
+		}
+	}
+
+	return false, scanner.Err()
+}
+
 // CountFileLines returns the number lines in file.
 func CountFileLines(path string) (int, error) {
 
