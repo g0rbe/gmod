@@ -1,4 +1,4 @@
-package gmod
+package gfile
 
 import (
 	"math/rand"
