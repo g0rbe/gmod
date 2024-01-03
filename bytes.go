@@ -1,32 +1,15 @@
 package gmod
 
+var (
+	Digits      = []byte{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
+	LetterLower = []byte{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'}
+	LetterUpper = []byte{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
+)
+
 // IsDigit returns whether c is a number character ascii code.
 func IsDigit(c byte) bool {
 
-	switch c {
-	case '0':
-		return true
-	case '1':
-		return true
-	case '2':
-		return true
-	case '3':
-		return true
-	case '4':
-		return true
-	case '5':
-		return true
-	case '6':
-		return true
-	case '7':
-		return true
-	case '8':
-		return true
-	case '9':
-		return true
-	default:
-		return false
-	}
+	return c >= '0' && c <= '9'
 }
 
 // IsHexa returns whether c is a hexadecimal (0-9 a-f A-F) character ascii code.
