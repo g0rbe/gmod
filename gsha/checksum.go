@@ -56,6 +56,13 @@ func (cs CheckSum) Compare(b CheckSum) int {
 	return bytes.Compare(cs, b)
 }
 
+// Data256 returns the SHA256 checksum of data.
+func Data256(data []byte) CheckSum {
+
+	s := sha256.Sum256(data)
+	return s[:]
+}
+
 // File256 returns the SHA256 checksum of file.
 func File256(file *os.File) (CheckSum, error) {
 
@@ -90,6 +97,13 @@ func Check256(path string, sum CheckSum) (bool, error) {
 	}
 
 	return cs.Compare(sum) == 0, nil
+}
+
+// Data512 returns the SHA512 checksum of data.
+func Data512(data []byte) CheckSum {
+
+	s := sha512.Sum256(data)
+	return s[:]
 }
 
 // File512 returns the SHA512 checksum of file.
