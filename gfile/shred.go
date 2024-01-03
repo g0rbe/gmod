@@ -12,7 +12,7 @@ import (
 // Removes the file at the end if remove is true.
 func Shred(path string, n int, random bool, remove bool) (int64, error) {
 
-	file, err := os.OpenFile(path, os.O_WRONLY, 0)
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_SYNC, 0)
 	if err != nil {
 		return -1, fmt.Errorf("failed to open: %w", err)
 	}
