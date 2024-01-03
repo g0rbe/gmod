@@ -4,9 +4,13 @@ import (
 	"testing"
 )
 
+var (
+	TestFilePath = "filestat.go"
+)
+
 func TestGetFileOwner(t *testing.T) {
 
-	owner, err := GetFileOwner("fileStat.go")
+	owner, err := GetFileOwner(TestFilePath)
 	if err != nil {
 		t.Errorf("Failed to get owner: %s\n", err)
 	}
@@ -17,7 +21,7 @@ func TestGetFileOwner(t *testing.T) {
 func BenchmarkGetFileOwner(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
-		_, err := GetFileOwner("fileStat.go")
+		_, err := GetFileOwner(TestFilePath)
 		if err != nil {
 			b.Errorf("Failed to get owner: %s\n", err)
 		}
@@ -26,7 +30,7 @@ func BenchmarkGetFileOwner(b *testing.B) {
 
 func TestGetFileGroup(t *testing.T) {
 
-	group, err := GetFileGroup("fileStat.go")
+	group, err := GetFileGroup(TestFilePath)
 	if err != nil {
 		t.Errorf("Failed to get group: %s\n", err)
 	}
@@ -37,7 +41,7 @@ func TestGetFileGroup(t *testing.T) {
 func BenchmarkGetFileGroup(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
-		_, err := GetFileGroup("fileStat.go")
+		_, err := GetFileGroup(TestFilePath)
 		if err != nil {
 			b.Errorf("Failed to get group: %s\n", err)
 		}

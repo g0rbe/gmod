@@ -8,14 +8,13 @@ import (
 	"os"
 	"syscall"
 
-	"github.com/g0rbe/go-filemode"
 	"golang.org/x/sys/unix"
 )
 
-// IsLineInFile check whether s is exactly a line in file in path.
+// ContainsLine reports whether line is in path file.
 // A line in the file does not contains the newline character ("\n").
 // This function uses bufio.Scanner to able to handle large files.
-func IsLineInFile(path, s string) (bool, error) {
+func ContainsLine(path, line string) (bool, error) {
 
 	file, err := os.OpenFile(path, os.O_RDONLY, 0644)
 	if err != nil {
@@ -26,7 +25,7 @@ func IsLineInFile(path, s string) (bool, error) {
 	scanner := bufio.NewScanner(file)
 
 	for scanner.Scan() {
-		if scanner.Text() == s {
+		if scanner.Text() == line {
 			return true, nil
 		}
 	}
@@ -34,10 +33,10 @@ func IsLineInFile(path, s string) (bool, error) {
 	return false, scanner.Err()
 }
 
-// IsStringInFile check whether file path is contains s string.
+// Contains reports whether substr is in path file.
 // A line in the file does not contains the newline character ("\n").
 // This function uses bufio.Scanner to able to handle large files.
-func IsStringInFile(path, s string) (bool, error) {
+func Contains(path, substr string) (bool, error) {
 
 	file, err := os.OpenFile(path, os.O_RDONLY, 0644)
 	if err != nil {
@@ -48,7 +47,7 @@ func IsStringInFile(path, s string) (bool, error) {
 	scanner := bufio.NewScanner(file)
 
 	for scanner.Scan() {
-		if scanner.Text() == s {
+		if scanner.Text() == substr {
 			return true, nil
 		}
 	}
@@ -106,5 +105,10 @@ func IsExists(path string) (bool, error) {
 // IsDir returns whether path is a directory.
 func IsDir(path string) (bool, error) {
 
-	return filemode.IsDirPath(path)
+	stat, err := os.Stat(path)
+	if err != nil {
+		return false, err
+	}
+
+	return stat.IsDir(), nil
 }

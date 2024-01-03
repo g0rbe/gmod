@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestIsLineInFile(t *testing.T) {
+func TestContainsLine(t *testing.T) {
 
 	file, err := os.OpenFile("testfile", os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
@@ -19,7 +19,7 @@ func TestIsLineInFile(t *testing.T) {
 		t.Fatalf("Failed to write to testfile: %s\n", err)
 	}
 
-	exist, err := IsLineInFile("testfile", "d")
+	exist, err := ContainsLine("testfile", "d")
 	if err != nil {
 		t.Fatalf("%s\n", err)
 	}
@@ -29,7 +29,7 @@ func TestIsLineInFile(t *testing.T) {
 	}
 }
 
-func TestCountFileLines(t *testing.T) {
+func TestCountLines(t *testing.T) {
 
 	randLen := rand.Intn(10240)
 
@@ -54,7 +54,7 @@ func TestCountFileLines(t *testing.T) {
 	}
 }
 
-func BenchmarkIsLineinFile(b *testing.B) {
+func BenchmarkContainsLine(b *testing.B) {
 
 	file, err := os.OpenFile("testfile", os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
@@ -72,7 +72,7 @@ func BenchmarkIsLineinFile(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		IsLineInFile("testfile", "d")
+		ContainsLine("testfile", "d")
 	}
 
 }
@@ -152,10 +152,17 @@ func TestIsDir(t *testing.T) {
 
 	testName := "testdir"
 
-	err := os.Mkdir(testName, 0600)
+	err := os.MkdirAll(testName, 0600)
 	if err != nil {
 		t.Fatalf("Failed to create %s: %s\n", testName, err)
 	}
+
+	defer func() {
+		err = os.Remove(testName)
+		if err != nil {
+			t.Fatalf("Failed to remove %s: %s\n", testName, err)
+		}
+	}()
 
 	ok, err := IsDir(testName)
 	if err != nil {
@@ -166,17 +173,13 @@ func TestIsDir(t *testing.T) {
 		t.Fatalf("FAIL: %s should be a directory!\n", testName)
 	}
 
-	err = os.Remove(testName)
-	if err != nil {
-		t.Fatalf("Failed to remove %s: %s\n", testName, err)
-	}
 }
 
 func BenchmarkIsDirTrue(b *testing.B) {
 
 	testName := "testdir"
 
-	err := os.Mkdir(testName, 0600)
+	err := os.MkdirAll(testName, 0600)
 	if err != nil {
 		b.Fatalf("Failed to create %s: %s\n", testName, err)
 	}
