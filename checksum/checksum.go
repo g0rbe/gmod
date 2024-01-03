@@ -1,5 +1,5 @@
 // Compute and check SHA256/SHA512 message digest
-package gsha
+package checksum
 
 import (
 	"bytes"
@@ -102,7 +102,7 @@ func Check256(path string, sum CheckSum) (bool, error) {
 // Data512 returns the SHA512 checksum of data.
 func Data512(data []byte) CheckSum {
 
-	s := sha512.Sum256(data)
+	s := sha512.Sum512(data)
 	return s[:]
 }
 
