@@ -14,34 +14,34 @@ const (
 	WHITE  = "\033[97m"
 )
 
-func Red(s string) string {
-	return fmt.Sprint(RED, s, RESET)
+func Red(a any) string {
+	return fmt.Sprint(RED, a, RESET)
 }
 
-func Green(s string) string {
-	return fmt.Sprint(GREEN, s, RESET)
+func Green(a any) string {
+	return fmt.Sprint(GREEN, a, RESET)
 }
 
-func Yellow(s string) string {
-	return fmt.Sprint(YELLOW, s, RESET)
+func Yellow(a any) string {
+	return fmt.Sprint(YELLOW, a, RESET)
 }
 
-func Blue(s string) string {
-	return fmt.Sprint(BLUE, s, RESET)
+func Blue(a any) string {
+	return fmt.Sprint(BLUE, a, RESET)
 }
 
-func Purple(s string) string {
-	return fmt.Sprint(PURPLE, s, RESET)
+func Purple(a any) string {
+	return fmt.Sprint(PURPLE, a, RESET)
 }
 
-func Cyan(s string) string {
-	return fmt.Sprint(CYAN, s, RESET)
+func Cyan(a any) string {
+	return fmt.Sprint(CYAN, a, RESET)
 }
 
-func Gray(s string) string {
-	return fmt.Sprint(GRAY, s, RESET)
+func Gray(a any) string {
+	return fmt.Sprint(GRAY, a, RESET)
 }
 
-func White(s string) string {
-	return fmt.Sprint(WHITE, s, RESET)
+func White(a any) string {
+	return fmt.Sprint(WHITE, a, RESET)
 }
