@@ -7,6 +7,10 @@ import (
 	"os"
 )
 
+var (
+	ShredIterations = 3 // Default iteration number for Shred()
+)
+
 // shred overwrite file for n times with random (if random is true) or zeroes.
 // Seek to the beginning of file at every iteration.
 func shred(file *os.File, n int, random bool) (int64, error) {
