@@ -13,5 +13,10 @@ func Truncate(file *os.File) error {
 		return fmt.Errorf("failed to shred: %w", err)
 	}
 
+	_, err = file.Seek(0, 0)
+	if err != nil {
+		return fmt.Errorf("failed to seek: %w", err)
+	}
+
 	return file.Truncate(0)
 }
