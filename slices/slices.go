@@ -169,3 +169,19 @@ func RemoveDuplicates[T comparable](s []T) []T {
 
 	return v
 }
+
+// Equal returns true if s1 and s2 equal.
+func Equal[T comparable](s1 []T, s2 []T) bool {
+
+	if len(s1) != len(s2) {
+		return false
+	}
+
+	for i := range s1 {
+		if s1[i] != s2[i] {
+			return false
+		}
+	}
+
+	return true
+}
