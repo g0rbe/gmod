@@ -4,10 +4,10 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/g0rbe/gmod"
+	"github.com/g0rbe/gmod/bitter"
+	"github.com/g0rbe/gmod/net/dns"
 	"github.com/g0rbe/gmod/net/ip"
 	"github.com/g0rbe/gmod/net/tcp"
-	"github.com/g0rbe/slitu"
 )
 
 // isSpecialScheme returns whether scheme s is special.
@@ -41,11 +41,11 @@ func checkURLCodePoints(s string) bool {
 	for i := 0; i < l; i++ {
 
 		switch {
-		case gmod.IsDigit(s[i]):
+		case bitter.IsDigit(s[i]):
 			continue
-		case gmod.IsLowerLetter(s[i]):
+		case bitter.IsLowerLetter(s[i]):
 			continue
-		case gmod.IsUpperLetter(s[i]):
+		case bitter.IsUpperLetter(s[i]):
 			continue
 		case s[i] == '!':
 			continue
@@ -94,11 +94,11 @@ func checkURLCodePoints(s string) bool {
 				return false
 			}
 
-			if !slitu.IsHexa(s[i+1]) {
+			if !bitter.IsHexa(s[i+1]) {
 				return false
 			}
 
-			if !slitu.IsHexa(s[i+2]) {
+			if !bitter.IsHexa(s[i+2]) {
 				return false
 			}
 
@@ -177,11 +177,11 @@ func checkValidHost(h string) bool {
 		return false
 	}
 
-	if DomainPart(host) {
+	if dns.IsDomainPart(host) {
 		return true
 	}
 
-	if Domain(host) {
+	if dns.IsDomain(host) {
 		return true
 	}
 
@@ -263,9 +263,5 @@ func URL(v string) bool {
 	 * See: https://url.spec.whatwg.org/#url-fragment-string
 	 */
 
-	if !checkURLCodePoints(r.Fragment) {
-		return false
-	}
-
-	return true
+	return checkURLCodePoints(r.Fragment)
 }

@@ -1,6 +1,10 @@
 package validator
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/g0rbe/gmod/net/dns"
+)
 
 func emailLocal(v string) bool {
 
@@ -61,7 +65,7 @@ func Email(v string) bool {
 	}
 
 	// Invaid domain
-	if !Domain(v[sep+1:]) {
+	if !dns.IsDomain(v[sep+1:]) {
 		return false
 	}
 
