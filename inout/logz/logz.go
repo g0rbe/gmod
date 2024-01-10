@@ -1,7 +1,7 @@
 // A simple package for logging.
 //
 // The getters and setters are thread-safe functions using the package level *sync.RWMutex.
-package glog
+package logz
 
 import (
 	"fmt"
