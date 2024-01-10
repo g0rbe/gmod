@@ -1,5 +1,5 @@
 // Manage PID files
-package gpid
+package filio
 
 import (
 	"bytes"
@@ -16,9 +16,9 @@ var (
 	ErrInvalidPid = errors.New("invalid pid")
 )
 
-// CreatePath creates the pid file in path with mode perm (before umask).
+// PIDCreate creates the pid file in path with mode perm (before umask).
 // The file in path should not exist.
-func CreatePath(path string, perm uint32) error {
+func PIDCreate(path string, perm uint32) error {
 
 	// Use O_EXCL to make sure that the file not exist
 	file, err := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_WRONLY, fs.FileMode(perm))
@@ -35,13 +35,13 @@ func CreatePath(path string, perm uint32) error {
 	return nil
 }
 
-// ReadPath returns the stored pid in path.
+// PIDRead returns the stored pid in path.
 // Remove the newline character ('\n') from the content if exist.
 //
 // Returns -1 if error occured.
 // Returns ErrEmpty if file is empty.
 // Returns ErrInvalidPid if the content is an invalid (eg.: not a number).
-func ReadPath(path string) (int, error) {
+func PIDRead(path string) (int, error) {
 
 	out, err := os.ReadFile(path)
 	if err != nil {
@@ -68,9 +68,9 @@ func ReadPath(path string) (int, error) {
 //
 // Returns ErrEmpty if lock file is empty.
 // Returns ErrInvalidPid if the content is an invalid (eg.: not a number).
-func CheckPath(path string) (bool, error) {
+func PIDCheck(path string) (bool, error) {
 
-	pid, err := ReadPath(path)
+	pid, err := PIDRead(path)
 	if err != nil {
 		return false, err
 	}
@@ -80,7 +80,8 @@ func CheckPath(path string) (bool, error) {
 	return err == nil, err
 }
 
-// RemovePath deletes the pid file in path.
-func RemovePath(path string) error {
+// PIDRemove deletes the pid file in path.
+// Simply calls os.Remove(path).
+func PIDRemove(path string) error {
 	return os.Remove(path)
 }

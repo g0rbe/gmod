@@ -1,20 +1,20 @@
-package gpid
+package filio
 
 import "testing"
 
 const TestPath = "./test.pid"
 
-func TestCreate(t *testing.T) {
+func TestPIDCreate(t *testing.T) {
 
-	err := CreatePath(TestPath, 0600)
+	err := PIDCreate(TestPath, 0600)
 	if err != nil {
 		t.Fatalf("%s\n", err)
 	}
 }
 
-func TestRead(t *testing.T) {
+func TestPIDRead(t *testing.T) {
 
-	pid, err := ReadPath(TestPath)
+	pid, err := PIDRead(TestPath)
 	if err != nil {
 		t.Fatalf("Failed to read: %s\n", err)
 	}
@@ -22,9 +22,9 @@ func TestRead(t *testing.T) {
 	t.Logf("pid: %d\n", pid)
 }
 
-func TestCheck(t *testing.T) {
+func TestPIDCheck(t *testing.T) {
 
-	exist, err := CheckPath(TestPath)
+	exist, err := PIDCheck(TestPath)
 	if err != nil {
 		t.Fatalf("Failed to check: %s\n", err)
 	}
@@ -34,9 +34,9 @@ func TestCheck(t *testing.T) {
 	}
 }
 
-func TestRemove(t *testing.T) {
+func TestPIDRemove(t *testing.T) {
 
-	err := RemovePath(TestPath)
+	err := PIDRemove(TestPath)
 	if err != nil {
 		t.Fatalf("%s\n", err)
 	}

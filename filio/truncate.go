@@ -1,4 +1,4 @@
-package gfile
+package filio
 
 import (
 	"fmt"
