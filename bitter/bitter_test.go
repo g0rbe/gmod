@@ -1,4 +1,4 @@
-package bytes
+package bitter
 
 import "testing"
 
