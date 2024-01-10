@@ -1,4 +1,4 @@
-package gmod
+package bytes
 
 import "testing"
 
