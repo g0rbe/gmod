@@ -1,5 +1,9 @@
 // Provides basic API for pinentry
 //
+// Inspired by [github.com/twpayne/go-pinentry](https://github.com/twpayne/go-pinentry).
+//
+// Pinentry documentation: https://www.elmasy.com/posts/pinentry/documentation/
+//
 // BUG(g0rbe): If the password does not match, pinentry will freeze and the only option is to Cancel when ErrOpCancelled is returned.
 package pinentry
 
