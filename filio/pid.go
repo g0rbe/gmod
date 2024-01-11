@@ -38,7 +38,7 @@ func PIDCreate(path string, perm uint32) error {
 // PIDRead returns the stored pid in path.
 // Remove the newline character ('\n') from the content if exist.
 //
-// Returns -1 if error occured.
+// Returns -1 if error occurred.
 // Returns ErrEmpty if file is empty.
 // Returns ErrInvalidPid if the content is an invalid (eg.: not a number).
 func PIDRead(path string) (int, error) {

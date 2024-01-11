@@ -42,7 +42,7 @@ func parseError(code int, body []byte) error {
 
 	}
 
-	// If error occured, the error struct is inside the returned struct
+	// If error occurred, the error struct is inside the returned struct
 	// eg.: {"zones": ..., "meta": ..., "error": ...}
 
 	// This strict is unmarshal the error field only
