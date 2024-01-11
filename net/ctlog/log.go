@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/g0rbe/gmod/net/dns"
-	"github.com/g0rbe/gmod/slices"
+	"github.com/g0rbe/gmod/slicer"
 	gct "github.com/google/certificate-transparency-go"
 	"github.com/google/certificate-transparency-go/client"
 	"github.com/google/certificate-transparency-go/jsonclient"
@@ -141,24 +141,24 @@ func GetDomains(url string, start int64) ([]string, int64, error) {
 		if e.X509Cert != nil {
 
 			if dns.IsDomain(e.X509Cert.Subject.CommonName) {
-				r = slices.AppendUnique(r, e.X509Cert.Subject.CommonName)
+				r = slicer.AppendUnique(r, e.X509Cert.Subject.CommonName)
 			}
 
 			for ii := range e.X509Cert.DNSNames {
 				if dns.IsDomain(e.X509Cert.DNSNames[ii]) {
-					r = slices.AppendUnique(r, e.X509Cert.DNSNames[ii])
+					r = slicer.AppendUnique(r, e.X509Cert.DNSNames[ii])
 				}
 			}
 
 			for ii := range e.X509Cert.PermittedDNSDomains {
 				if dns.IsDomain(e.X509Cert.PermittedDNSDomains[ii]) {
-					r = slices.AppendUnique(r, e.X509Cert.PermittedDNSDomains[ii])
+					r = slicer.AppendUnique(r, e.X509Cert.PermittedDNSDomains[ii])
 				}
 			}
 
 			for ii := range e.X509Cert.ExcludedDNSDomains {
 				if dns.IsDomain(e.X509Cert.ExcludedDNSDomains[ii]) {
-					r = slices.AppendUnique(r, e.X509Cert.ExcludedDNSDomains[ii])
+					r = slicer.AppendUnique(r, e.X509Cert.ExcludedDNSDomains[ii])
 				}
 			}
 		}
@@ -166,24 +166,24 @@ func GetDomains(url string, start int64) ([]string, int64, error) {
 		if e.Precert != nil && e.Precert.TBSCertificate != nil {
 
 			if dns.IsDomain(e.Precert.TBSCertificate.Subject.CommonName) {
-				r = slices.AppendUnique(r, e.Precert.TBSCertificate.Subject.CommonName)
+				r = slicer.AppendUnique(r, e.Precert.TBSCertificate.Subject.CommonName)
 			}
 
 			for ii := range e.Precert.TBSCertificate.DNSNames {
 				if dns.IsDomain(e.Precert.TBSCertificate.DNSNames[ii]) {
-					r = slices.AppendUnique(r, e.Precert.TBSCertificate.DNSNames[ii])
+					r = slicer.AppendUnique(r, e.Precert.TBSCertificate.DNSNames[ii])
 				}
 			}
 
 			for ii := range e.Precert.TBSCertificate.PermittedDNSDomains {
 				if dns.IsDomain(e.Precert.TBSCertificate.PermittedDNSDomains[ii]) {
-					r = slices.AppendUnique(r, e.Precert.TBSCertificate.PermittedDNSDomains[ii])
+					r = slicer.AppendUnique(r, e.Precert.TBSCertificate.PermittedDNSDomains[ii])
 				}
 			}
 
 			for ii := range e.Precert.TBSCertificate.ExcludedDNSDomains {
 				if dns.IsDomain(e.Precert.TBSCertificate.ExcludedDNSDomains[ii]) {
-					r = slices.AppendUnique(r, e.Precert.TBSCertificate.ExcludedDNSDomains[ii])
+					r = slicer.AppendUnique(r, e.Precert.TBSCertificate.ExcludedDNSDomains[ii])
 				}
 			}
 		}
