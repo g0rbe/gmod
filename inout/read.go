@@ -15,6 +15,8 @@ func ReadByte(r io.Reader) (byte, error) {
 
 // ReadByte reads bytes from r until a newline character ('\n') or EOF.
 // EOF is returned as an error.
+//
+// NOTE: This is an expensive function as allocates new for byte read.
 func ReadLine(r io.Reader) ([]byte, error) {
 
 	var (
