@@ -1,5 +1,5 @@
 // Manage PID files
-package filio
+package freax
 
 import (
 	"bytes"

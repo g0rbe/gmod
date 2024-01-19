@@ -1,12 +1,18 @@
-package filio
+package freax_test
 
-import "testing"
+import (
+	"testing"
 
-const TestPath = "./test.pid"
+	"github.com/g0rbe/gmod/freax"
+)
+
+var (
+	PidTestPath = "./test.pid"
+)
 
 func TestPIDCreate(t *testing.T) {
 
-	err := PIDCreate(TestPath, 0600)
+	err := freax.PIDCreate(PidTestPath, 0600)
 	if err != nil {
 		t.Fatalf("%s\n", err)
 	}
@@ -14,7 +20,7 @@ func TestPIDCreate(t *testing.T) {
 
 func TestPIDRead(t *testing.T) {
 
-	pid, err := PIDRead(TestPath)
+	pid, err := freax.PIDRead(PidTestPath)
 	if err != nil {
 		t.Fatalf("Failed to read: %s\n", err)
 	}
@@ -24,7 +30,7 @@ func TestPIDRead(t *testing.T) {
 
 func TestPIDCheck(t *testing.T) {
 
-	exist, err := PIDCheck(TestPath)
+	exist, err := freax.PIDCheck(PidTestPath)
 	if err != nil {
 		t.Fatalf("Failed to check: %s\n", err)
 	}
@@ -36,7 +42,7 @@ func TestPIDCheck(t *testing.T) {
 
 func TestPIDRemove(t *testing.T) {
 
-	err := PIDRemove(TestPath)
+	err := freax.PIDRemove(PidTestPath)
 	if err != nil {
 		t.Fatalf("%s\n", err)
 	}

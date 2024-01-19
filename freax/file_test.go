@@ -1,9 +1,13 @@
-package filio
+//go:build linux
+
+package freax_test
 
 import (
 	"math/rand"
 	"os"
 	"testing"
+
+	"github.com/g0rbe/gmod/freax"
 )
 
 func TestContainsLine(t *testing.T) {
@@ -19,7 +23,7 @@ func TestContainsLine(t *testing.T) {
 		t.Fatalf("Failed to write to testfile: %s\n", err)
 	}
 
-	exist, err := ContainsLine("testfile", "d")
+	exist, err := freax.FileContainsLine("testfile", "d")
 	if err != nil {
 		t.Fatalf("%s\n", err)
 	}
@@ -44,7 +48,7 @@ func TestCountLines(t *testing.T) {
 		file.Write([]byte{'a', '\n'})
 	}
 
-	n, err := CountLines("testfile")
+	n, err := freax.FileCountLines("testfile")
 	if err != nil {
 		t.Fatalf("Failed to count: %s\n", err)
 	}
@@ -72,7 +76,7 @@ func BenchmarkContainsLine(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		ContainsLine("testfile", "d")
+		freax.FileContainsLine("testfile", "d")
 	}
 
 }
@@ -91,7 +95,7 @@ func TestIsExists(t *testing.T) {
 		t.Fatalf("Failed to close %s: %s\n", testName, err)
 	}
 
-	ok, err := IsExists(testName)
+	ok, err := freax.IsPathExists(testName)
 	if err != nil {
 		t.Fatalf("FAIL: failed to check if exist: %s\n", err)
 	}
@@ -131,7 +135,7 @@ func BenchmarkIsExistsTrue(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		IsExists(testName)
+		freax.IsPathExists(testName)
 	}
 
 }
@@ -143,71 +147,7 @@ func BenchmarkIsExistsFalse(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		IsExists(testName)
-	}
-
-}
-
-func TestIsDir(t *testing.T) {
-
-	testName := "testdir"
-
-	err := os.MkdirAll(testName, 0600)
-	if err != nil {
-		t.Fatalf("Failed to create %s: %s\n", testName, err)
-	}
-
-	defer func() {
-		err = os.Remove(testName)
-		if err != nil {
-			t.Fatalf("Failed to remove %s: %s\n", testName, err)
-		}
-	}()
-
-	ok, err := IsDir(testName)
-	if err != nil {
-		t.Fatalf("FAIL: failed to check directory: %s\n", err)
-	}
-
-	if !ok {
-		t.Fatalf("FAIL: %s should be a directory!\n", testName)
-	}
-
-}
-
-func BenchmarkIsDirTrue(b *testing.B) {
-
-	testName := "testdir"
-
-	err := os.MkdirAll(testName, 0600)
-	if err != nil {
-		b.Fatalf("Failed to create %s: %s\n", testName, err)
-	}
-
-	clean := func() {
-		err = os.Remove(testName)
-		if err != nil {
-			b.Fatalf("Failed to remove %s: %s\n", testName, err)
-		}
-	}
-	b.Cleanup(clean)
-
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
-		IsDir(testName)
-	}
-
-}
-
-func BenchmarkIsDirFalse(b *testing.B) {
-
-	testName := "testdir"
-
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
-		IsDir(testName)
+		freax.IsPathExists(testName)
 	}
 
 }

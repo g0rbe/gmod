@@ -1,4 +1,4 @@
-package filio
+package freax
 
 import (
 	"bufio"
@@ -11,10 +11,10 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-// ContainsLine reports whether line is in path file.
+// FileContainsLine reports whether line is in path file.
 // A line in the file does not contains the newline character ("\n").
 // This function uses bufio.Scanner to able to handle large files.
-func ContainsLine(path, line string) (bool, error) {
+func FileContainsLine(path, line string) (bool, error) {
 
 	file, err := os.OpenFile(path, os.O_RDONLY, 0644)
 	if err != nil {
@@ -33,10 +33,10 @@ func ContainsLine(path, line string) (bool, error) {
 	return false, scanner.Err()
 }
 
-// Contains reports whether substr is in path file.
+// FileContains reports whether substr is in path file.
 // A line in the file does not contains the newline character ("\n").
 // This function uses bufio.Scanner to able to handle large files.
-func Contains(path, substr string) (bool, error) {
+func FileContains(path, substr string) (bool, error) {
 
 	file, err := os.OpenFile(path, os.O_RDONLY, 0644)
 	if err != nil {
@@ -55,8 +55,8 @@ func Contains(path, substr string) (bool, error) {
 	return false, scanner.Err()
 }
 
-// CountLines returns the number lines in file.
-func CountLines(path string) (int, error) {
+// FileCountLines returns the number lines in file.
+func FileCountLines(path string) (int, error) {
 
 	// Source: https://stackoverflow.com/questions/24562942/golang-how-do-i-determine-the-number-of-lines-in-a-file-efficiently
 
@@ -84,9 +84,9 @@ func CountLines(path string) (int, error) {
 	}
 }
 
-// IsExists returns whether path is exists.
+// IsPathExists returns whether path is exists.
 // If path is a symbolic link, it is dereferenced.
-func IsExists(path string) (bool, error) {
+func IsPathExists(path string) (bool, error) {
 
 	err := unix.Faccessat(unix.AT_FDCWD, path, syscall.F_OK, 0)
 	if err != nil {
@@ -100,15 +100,4 @@ func IsExists(path string) (bool, error) {
 
 	return true, nil
 
-}
-
-// IsDir returns whether path is a directory.
-func IsDir(path string) (bool, error) {
-
-	stat, err := os.Stat(path)
-	if err != nil {
-		return false, err
-	}
-
-	return stat.IsDir(), nil
 }

@@ -1,4 +1,6 @@
-package filio
+//go:build linux
+
+package freax
 
 import (
 	"fmt"

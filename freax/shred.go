@@ -1,4 +1,4 @@
-package filio
+package freax
 
 import (
 	"crypto/rand"
