@@ -1,16 +1,37 @@
-package rnd
+package entropy_test
 
 import (
-	crand "crypto/rand"
-	mrand "math/rand"
 	"testing"
 
-	"github.com/g0rbe/gmod/bitter"
+	"github.com/g0rbe/gmod/entropy"
 )
+
+func TestGetandom(t *testing.T) {
+
+	buf := make([]byte, 8)
+
+	err := entropy.Getrandom(buf, 0)
+	if err != nil {
+		t.Fatalf("Error: %s'\n", err)
+	}
+
+	t.Logf("%v\n", buf)
+}
+
+func BenchmarkGetrandom(b *testing.B) {
+
+	buf := make([]byte, 8)
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		entropy.Getrandom(buf, 0)
+	}
+}
 
 func TestBytes(t *testing.T) {
 
-	buf := Bytes(8)
+	buf := entropy.Bytes(64)
 
 	t.Logf("%v\n", buf)
 }
@@ -18,32 +39,25 @@ func TestBytes(t *testing.T) {
 func BenchmarkBytes(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
-		Bytes(8)
+		entropy.Bytes(8)
 	}
 }
 
-func BenchmarkCryptoBytes(b *testing.B) {
+func TestInt(t *testing.T) {
 
-	for i := 0; i < b.N; i++ {
-		bitter.ReadReaderBytes(crand.Reader, 8)
-	}
-}
-
-func TestInt64(t *testing.T) {
-
-	v := Int64()
+	v := entropy.Int()
 
 	t.Logf("%d\n", v)
 }
 
-func BenchmarkInt64(b *testing.B) {
+func BenchmarkInt(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
-		Int64()
+		entropy.Int()
 	}
 }
 
-func TestInt64n(t *testing.T) {
+func TestIntn(t *testing.T) {
 
 	var (
 		total = 10000000
@@ -59,7 +73,7 @@ func TestInt64n(t *testing.T) {
 
 	for i := 0; i < total; i++ {
 
-		switch v := Int64n(5); v {
+		switch v := entropy.Intn(5); v {
 		case 0:
 			zero++
 		case 1:
@@ -85,19 +99,13 @@ func TestInt64n(t *testing.T) {
 func BenchmarkInt64n(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
-		Int64n(5)
+		entropy.Intn(5)
 	}
 }
 
-func BenchmarkMathInt64n(b *testing.B) {
-
-	for i := 0; i < b.N; i++ {
-		mrand.Int63n(5)
-	}
-}
 func TestRandomString(t *testing.T) {
 
-	v := String([]byte("abcdefgh"), 10)
+	v := entropy.String([]byte("abcdefgh"), 10)
 	if len(v) != 10 {
 		t.Fatalf("FAIL: invalid length: %d, want: 10", len(v))
 	}
@@ -106,6 +114,6 @@ func TestRandomString(t *testing.T) {
 func BenchmarkRandomString(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
-		String([]byte("abcdefgh0"), 256)
+		entropy.String([]byte("abcdefgh0"), 256)
 	}
 }
