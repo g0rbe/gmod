@@ -1,4 +1,4 @@
-package bitter
+package octets
 
 import (
 	"fmt"

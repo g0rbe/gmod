@@ -1,5 +1,5 @@
 // Manipulate bytes.
-package bitter
+package octets
 
 var (
 	Digits      = []byte{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}

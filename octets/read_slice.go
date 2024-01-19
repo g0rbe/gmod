@@ -1,4 +1,4 @@
-package bitter
+package octets
 
 // ReadBytes removes the first n bytes from b and returns it.
 // If the read failed, returns nil.

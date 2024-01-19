@@ -1,4 +1,4 @@
-package bitter
+package octets
 
 // WriteBytes appends bytes at the end of b.
 func WriteBytes(b *[]byte, bytes ...byte) {
