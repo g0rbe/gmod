@@ -4,10 +4,10 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/g0rbe/gmod/bitter"
 	"github.com/g0rbe/gmod/net/dns"
 	"github.com/g0rbe/gmod/net/ip"
 	"github.com/g0rbe/gmod/net/tcp"
+	"github.com/g0rbe/gmod/octets"
 )
 
 // isSpecialScheme returns whether scheme s is special.
@@ -41,11 +41,11 @@ func checkURLCodePoints(s string) bool {
 	for i := 0; i < l; i++ {
 
 		switch {
-		case bitter.IsDigit(s[i]):
+		case octets.IsDigit(s[i]):
 			continue
-		case bitter.IsLowerLetter(s[i]):
+		case octets.IsLowerLetter(s[i]):
 			continue
-		case bitter.IsUpperLetter(s[i]):
+		case octets.IsUpperLetter(s[i]):
 			continue
 		case s[i] == '!':
 			continue
@@ -94,11 +94,11 @@ func checkURLCodePoints(s string) bool {
 				return false
 			}
 
-			if !bitter.IsHexa(s[i+1]) {
+			if !octets.IsHexa(s[i+1]) {
 				return false
 			}
 
-			if !bitter.IsHexa(s[i+2]) {
+			if !octets.IsHexa(s[i+2]) {
 				return false
 			}
 
