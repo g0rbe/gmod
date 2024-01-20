@@ -1,4 +1,4 @@
-package gmod
+package clock
 
 import (
 	"context"
