@@ -135,7 +135,7 @@ func FileModeSetPath(path string, m FileMode) error {
 	}
 	defer file.Close()
 
-	stat, err := Fstat(file)
+	stat, err := Fstat(int(file.Fd()))
 	if err != nil {
 		return fmt.Errorf("dtat failed: %w", err)
 	}
@@ -152,7 +152,7 @@ func FileModeUnsetPath(path string, m FileMode) error {
 	}
 	defer file.Close()
 
-	stat, err := Fstat(file)
+	stat, err := Fstat(int(file.Fd()))
 	if err != nil {
 		return fmt.Errorf("dtat failed: %w", err)
 	}

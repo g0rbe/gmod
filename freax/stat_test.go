@@ -13,7 +13,7 @@ var (
 
 func TestStat(t *testing.T) {
 
-	s, err := freax.Stat("fileinfo.go")
+	s, err := freax.Stat("stat.go")
 	if err != nil {
 		t.Fatalf("Error: %s\n", err)
 	}
@@ -24,22 +24,22 @@ func TestStat(t *testing.T) {
 func BenchmarkStat(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
-		freax.Stat("fileinfo.go")
+		freax.Stat("stat.go")
 	}
 }
 
 func TestFstat(t *testing.T) {
 
-	file, err := os.OpenFile("fileinfo.go", os.O_RDONLY, 0)
+	file, err := os.OpenFile("stat.go", os.O_RDONLY, 0)
 	if err != nil {
-		t.Fatalf("Failed to open fileinfo.go: %s\n", err)
+		t.Fatalf("Failed to open stat.go: %s\n", err)
 	}
 
 	t.Cleanup(func() {
 		file.Close()
 	})
 
-	s, err := freax.Fstat(file)
+	s, err := freax.Fstat(int(file.Fd()))
 	if err != nil {
 		t.Fatalf("Error: %s\n", err)
 	}
@@ -49,10 +49,12 @@ func TestFstat(t *testing.T) {
 
 func BenchmarkFstat(b *testing.B) {
 
-	file, err := os.OpenFile("fileinfo.go", os.O_RDONLY, 0)
+	file, err := os.OpenFile("stat.go", os.O_RDONLY, 0)
 	if err != nil {
-		b.Fatalf("Failed to open fileinfo.go: %s\n", err)
+		b.Fatalf("Failed to open stat.go: %s\n", err)
 	}
+
+	_fd := int(file.Fd())
 
 	b.Cleanup(func() {
 		file.Close()
@@ -61,12 +63,12 @@ func BenchmarkFstat(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		freax.Fstat(file)
+		freax.Fstat(_fd)
 	}
 }
 func TestLstat(t *testing.T) {
 
-	s, err := freax.Lstat("fileinfo.go")
+	s, err := freax.Lstat("stat.go")
 	if err != nil {
 		t.Fatalf("Error: %s\n", err)
 	}
@@ -77,6 +79,6 @@ func TestLstat(t *testing.T) {
 func BenchmarkLstat(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
-		freax.Lstat("fileinfo.go")
+		freax.Lstat("stat.go")
 	}
 }

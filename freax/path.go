@@ -1,37 +1,48 @@
 package freax
 
-import "bytes"
-
-const (
-	PathMax = 4096 // chars in a path name including nul
+import (
+	"os"
 )
 
-// PathJoin joins any number of path elements into a single path, separating them with slashes.
-// If the elem is empty or all its elements are empty, returns an empty string.
-func PathJoin(elem ...string) string {
+func ReadAll(name string) ([]byte, error) {
 
-	p := bytes.NewBuffer(make([]byte, 0, PathMax))
-
-	for i := range elem {
-
-		// Skip empty elements
-		if len(elem[i]) == 0 {
-			continue
-		}
-
-		p.WriteString(elem[i])
-
-		// Dont add '/' if this is the last elem
-		if i == len(elem)-1 {
-			break
-		}
-
-		// Add '/' to the elem if this elem is not the last
-		if elem[i][len(elem[i])-1] != '/' {
-			p.WriteByte('/')
-		}
-
+	file, err := OpenFile(name, os.O_RDONLY, 0)
+	if err != nil {
+		return nil, err
 	}
+	defer file.Close()
 
-	return p.String()
+	return FDReadAll(file.Fd())
+}
+
+// Write writes data to the file in path.
+// This function truncates the file before writing.
+// If path does not exist, create a new file with permission perm (before umask).
+func Write(name string, data []byte, perm uint32) error {
+
+	file, err := OpenFile(name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perm)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.Write(data)
+
+	return err
+}
+
+// WriteSync writes and syncronise data to the file in path.
+// This function truncates the file before writing.
+// If path does not exist, create a new file with permission perm (before umask).
+func WriteSync(name string, data []byte, perm uint32) error {
+
+	file, err := OpenFile(name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC|os.O_SYNC, perm)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.Write(data)
+
+	return err
 }

@@ -1,103 +1,123 @@
 package freax
 
 import (
-	"bufio"
-	"bytes"
-	"errors"
-	"io"
-	"os"
-	"syscall"
+	"sync"
 
 	"golang.org/x/sys/unix"
 )
 
-// FileContainsLine reports whether line is in path file.
-// A line in the file does not contains the newline character ("\n").
-// This function uses bufio.Scanner to able to handle large files.
-func FileContainsLine(path, line string) (bool, error) {
+// Flags to OpenFile wrapping those of the underlying system. Not all flags may be implemented on a given system.
+const (
+	// Exactly one of O_RDONLY, O_WRONLY, or O_RDWR must be specified.
+	O_RDONLY = unix.O_RDONLY // open the file read-only.
+	O_WRONLY = unix.O_WRONLY // open the file write-only.
+	O_RDWR   = unix.O_RDWR   // open the file read-write.
+	// The remaining values may be or'ed in to control behavior.
+	O_APPEND = unix.O_APPEND // append data to the file when writing.
+	O_CREATE = unix.O_CREAT  // create a new file if none exists.
+	O_EXCL   = unix.O_EXCL   // used with O_CREATE, file must not exist.
+	O_SYNC   = unix.O_SYNC   // open for synchronous I/O.
+	O_TRUNC  = unix.O_TRUNC  // truncate regular writable file when opened.
+)
 
-	file, err := os.OpenFile(path, os.O_RDONLY, 0644)
-	if err != nil {
-		return false, err
-	}
-	defer file.Close()
+// Seek whence values.
+const (
+	SEEK_SET = unix.SEEK_SET // seek relative to the origin of the file
+	SEEK_CUR = unix.SEEK_CUR // seek relative to the current offset
+	SEEK_END = unix.SEEK_END // seek relative to the end
+)
 
-	scanner := bufio.NewScanner(file)
-
-	for scanner.Scan() {
-		if scanner.Text() == line {
-			return true, nil
-		}
-	}
-
-	return false, scanner.Err()
+type File struct {
+	fd int
+	m  *sync.RWMutex
 }
 
-// FileContains reports whether substr is in path file.
-// A line in the file does not contains the newline character ("\n").
-// This function uses bufio.Scanner to able to handle large files.
-func FileContains(path, substr string) (bool, error) {
+func OpenFile(pathname string, flags int, mode uint32) (*File, error) {
 
-	file, err := os.OpenFile(path, os.O_RDONLY, 0644)
+	fd, err := unix.Open(pathname, flags, mode)
 	if err != nil {
-		return false, err
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-
-	for scanner.Scan() {
-		if scanner.Text() == substr {
-			return true, nil
-		}
+		return nil, err
 	}
 
-	return false, scanner.Err()
+	return &File{fd: fd, m: new(sync.RWMutex)}, nil
 }
 
-// FileCountLines returns the number lines in file.
-func FileCountLines(path string) (int, error) {
-
-	// Source: https://stackoverflow.com/questions/24562942/golang-how-do-i-determine-the-number-of-lines-in-a-file-efficiently
-
-	file, err := os.OpenFile(path, os.O_RDONLY, 0666)
-	if err != nil {
-		return 0, err
-	}
-	defer file.Close()
-
-	buf := make([]byte, 32*1024)
-	count := 0
-	lineSep := []byte{'\n'}
-
-	for {
-		c, err := file.Read(buf)
-		count += bytes.Count(buf[:c], lineSep)
-
-		switch {
-		case err == io.EOF:
-			return count, nil
-
-		case err != nil:
-			return count, err
-		}
-	}
+func (f *File) Read(p []byte) (n int, err error) {
+	return FDRead(f.Fd(), p)
 }
 
-// IsPathExists returns whether path is exists.
-// If path is a symbolic link, it is dereferenced.
-func IsPathExists(path string) (bool, error) {
+func (f *File) ReadByte() (byte, error) {
 
-	err := unix.Faccessat(unix.AT_FDCWD, path, syscall.F_OK, 0)
-	if err != nil {
+	b := make([]byte, 1)
 
-		if errors.Is(err, unix.ENOENT) {
-			err = nil
-		}
+	_, err := f.Read(b)
 
-		return false, err
+	return b[0], err
+}
+
+// func (f *File) ReadFrom(r io.Reader) (n int64, err error) {
+
+// }
+
+func (f *File) Write(p []byte) (n int, err error) {
+	return unix.Write(f.fd, p)
+}
+
+func (f *File) WriteByte(c byte) error {
+
+	_, err := unix.Write(f.fd, []byte{c})
+	return err
+}
+
+func (f *File) WriteString(s string) (n int, err error) {
+	return f.Write([]byte(s))
+}
+
+func (f *File) Seek(offset int64, whence int) (int64, error) {
+	return unix.Seek(f.fd, offset, whence)
+}
+
+func (f *File) Close() error {
+
+	if f == nil {
+		return nil
 	}
 
-	return true, nil
+	return unix.Close(f.fd)
+}
 
+func (f *File) Fd() uintptr {
+	return uintptr(f.fd)
+}
+
+func (f *File) Stat() (*FileInfo, error) {
+
+	return Fstat(f.fd)
+}
+
+func (f *File) Sync() error {
+	return unix.Fsync(f.fd)
+}
+
+// Lock locks the fd with FcntlFlock().
+// Blocks until the lock is not released.
+func (f *File) Lock() error {
+
+	fl, err := FcntlGetfl(uintptr(f.fd))
+	if err != nil {
+		return err
+	}
+
+	if fl&O_RDONLY == O_RDONLY {
+		return FlockSetReadWait(uintptr(f.fd))
+	}
+
+	return FlockSetWriteWait(uintptr(f.fd))
+}
+
+// Unlock unlocks the lockon fd.
+// Blocks until the lock is not released.
+func (f *File) Unlock() error {
+
+	return FlockUnlockWait(uintptr(f.fd))
 }

@@ -90,11 +90,11 @@ func Stat(path string) (*FileInfo, error) {
 }
 
 // Fstat returns information about a file specified by file.
-func Fstat(file *os.File) (*FileInfo, error) {
+func Fstat(fd int) (*FileInfo, error) {
 
 	s := new(unix.Stat_t)
 
-	err := unix.Fstat(int(file.Fd()), s)
+	err := unix.Fstat(fd, s)
 	if err != nil {
 		return nil, err
 	}

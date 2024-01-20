@@ -1,43 +1,75 @@
 package freax_test
 
 import (
-	"fmt"
-	"path"
+	"os"
 	"testing"
 
 	"github.com/g0rbe/gmod/freax"
 )
 
-func ExamplePathJoin() {
+func TestReadAll(t *testing.T) {
 
-	fmt.Printf("%s\n", freax.PathJoin("test", "path"))
-	fmt.Printf("%s\n", freax.PathJoin("test", "", "path"))
-	fmt.Printf("%s\n", freax.PathJoin("test/", "", "path"))
+	b, err := freax.ReadAll("path.go")
+	if err != nil {
+		t.Fatalf("Error: %s\n", err)
+	}
 
-	// Output:
-	// test/path
-	// test/path
-	// test/path
+	t.Logf("Read bytes: %d\n", len(b))
 }
 
-func TestPathJoin(t *testing.T) {
+func BenchmarkReadAll(b *testing.B) {
 
-	p := freax.PathJoin("test", "", "path/", "join")
-	if p != "test/path/join" {
-		t.Fatalf("Want \"test/path/join\", got \"%s\"\n", p)
+	for i := 0; i < b.N; i++ {
+		freax.ReadAll("path.go")
 	}
 }
 
-func BenchmarkPathJoin(b *testing.B) {
+func TestWrite(t *testing.T) {
 
-	for i := 0; i < b.N; i++ {
-		freax.PathJoin("test", "", "path/", "join")
+	t.Cleanup(func() {
+		os.RemoveAll("test.txt")
+	})
+
+	err := freax.Write("test.txt", []byte{'a', 'b', 'c'}, 0666)
+	if err != nil {
+		t.Fatalf("Error: %s\n", err)
 	}
 }
 
-func BenchmarkStdPathJoin(b *testing.B) {
+func BenchmarkWrite(b *testing.B) {
+
+	b.Cleanup(func() {
+		os.RemoveAll("test.txt")
+	})
+
+	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		path.Join("test", "", "path/", "join")
+		freax.Write("test.txt", []byte{'a', 'b', 'c'}, 0666)
+	}
+}
+
+func TestWriteSync(t *testing.T) {
+
+	t.Cleanup(func() {
+		os.RemoveAll("test.txt")
+	})
+
+	err := freax.WriteSync("test.txt", []byte{'a', 'b', 'c'}, 0666)
+	if err != nil {
+		t.Fatalf("Error: %s\n", err)
+	}
+}
+
+func BenchmarkWriteSync(b *testing.B) {
+
+	b.Cleanup(func() {
+		os.RemoveAll("test.txt")
+	})
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		freax.WriteSync("test.txt", []byte{'a', 'b', 'c'}, 0666)
 	}
 }

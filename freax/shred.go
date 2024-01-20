@@ -31,11 +31,11 @@ func shred(file *os.File, n int, random bool) (int64, error) {
 
 		var written int64
 
-		if random {
-			written, err = io.CopyN(file, rand.Reader, stat.Size())
-		} else {
-			written, err = io.CopyN(file, DevZero, stat.Size())
-		}
+		//if random {
+		written, err = io.CopyN(file, rand.Reader, stat.Size())
+		//} else {
+		//	written, err = io.CopyN(file, DevZero, stat.Size())
+		//}
 
 		totalWritten += written
 
@@ -72,8 +72,8 @@ func ShredLock(path string, n int, random bool) (int64, error) {
 	}
 	defer file.Close()
 
-	// Apply a blocking lock.
-	err = FlockWrite(file.Fd())
+	// Apply a nonblocking lock.
+	err = FlockSetWrite(file.Fd())
 	if err != nil {
 		return -1, fmt.Errorf("failed to lock: %w", err)
 	}
@@ -95,8 +95,8 @@ func ShredLockWait(path string, n int, random bool) (int64, error) {
 	}
 	defer file.Close()
 
-	// Apply a nonblocking lock.
-	err = FlockWriteWait(file.Fd())
+	// Apply a blocking lock.
+	err = FlockSetWriteWait(file.Fd())
 	if err != nil {
 		return -1, fmt.Errorf("failed to lock: %w", err)
 	}

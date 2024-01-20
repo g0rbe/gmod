@@ -1,153 +1,187 @@
-//go:build linux
-
 package freax_test
 
 import (
-	"math/rand"
+	"bytes"
+	"io"
 	"os"
 	"testing"
 
 	"github.com/g0rbe/gmod/freax"
 )
 
-func TestContainsLine(t *testing.T) {
+func TestOpenFile(t *testing.T) {
 
-	file, err := os.OpenFile("testfile", os.O_WRONLY|os.O_CREATE, 0644)
+	f, err := freax.OpenFile("file.go", freax.O_RDONLY, 0)
 	if err != nil {
-		t.Fatalf("Failed to create testfile: %s\n", err)
+		t.Fatalf("Error: %s\n", err)
 	}
-	defer os.Remove("testfile")
-	defer file.Close()
+	defer f.Close()
 
-	if _, err := file.WriteString("a\nb\nc\nd\n"); err != nil {
-		t.Fatalf("Failed to write to testfile: %s\n", err)
-	}
-
-	exist, err := freax.FileContainsLine("testfile", "d")
-	if err != nil {
-		t.Fatalf("%s\n", err)
-	}
-
-	if !exist {
-		t.Fatalf("\"d\" should exist in testfile\n")
-	}
 }
 
-func TestCountLines(t *testing.T) {
+func TestFileRead(t *testing.T) {
 
-	randLen := rand.Intn(10240)
-
-	file, err := os.OpenFile("testfile", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+	f, err := freax.OpenFile("file.go", freax.O_RDONLY, 0)
 	if err != nil {
-		t.Fatalf("Failed to create test file: %s\n", err)
+		t.Fatalf("Error open: %s\n", err)
 	}
-	defer os.Remove("testfile")
-	defer file.Close()
+	defer f.Close()
 
-	for i := 0; i < randLen; i++ {
-		file.Write([]byte{'a', '\n'})
-	}
+	buf := make([]byte, 7)
 
-	n, err := freax.FileCountLines("testfile")
+	n, err := f.Read(buf)
 	if err != nil {
-		t.Fatalf("Failed to count: %s\n", err)
+		t.Fatalf("Error read: %s\n", err)
+	}
+	if n != 7 {
+		t.Fatalf("Error read: bytes read: %d, should be 7\n", n)
 	}
 
-	if n != randLen {
-		t.Fatalf("Invalid result: want: %d, got: %d\n", randLen, n)
-	}
+	t.Logf("%s\n", buf)
+
 }
 
-func BenchmarkContainsLine(b *testing.B) {
+func TestFileIoReadAll(t *testing.T) {
 
-	file, err := os.OpenFile("testfile", os.O_WRONLY|os.O_CREATE, 0644)
+	f, err := freax.OpenFile("file.go", freax.O_RDONLY, 0)
 	if err != nil {
-		b.Fatalf("Failed to create testfile: %s\n", err)
+		t.Fatalf("Error open: %s\n", err)
 	}
-	defer os.Remove("testfile")
-	defer file.Close()
+	defer f.Close()
 
-	if _, err := file.WriteString("a\nb\nc\nd\n"); err != nil {
-		b.Fatalf("Failed to write to testfile: %s\n", err)
+	buf, err := io.ReadAll(f)
+	if err != nil {
+		t.Fatalf("Error read: %s\n", err)
 	}
 
-	file.Close()
+	t.Logf("Bytes read: %d\n", len(buf))
+
+}
+
+func TestFileWrite(t *testing.T) {
+
+	defer os.RemoveAll("test.txt")
+
+	f, err := freax.OpenFile("test.txt", freax.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		t.Fatalf("Error open: %s\n", err)
+	}
+	defer f.Close()
+
+	buf := make([]byte, 7)
+
+	n, err := f.Write(buf)
+	if err != nil {
+		t.Fatalf("Error write: %s\n", err)
+	}
+	if n != 7 {
+		t.Fatalf("Error write: bytes write: %d, should be 7\n", n)
+	}
+
+}
+
+func BenchmarkFileReadWrite(b *testing.B) {
+
+	buf1 := []byte{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
+	buf2 := []byte{'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'}
+
+	b.Cleanup(func() { os.RemoveAll("test.txt") })
 
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		freax.FileContainsLine("testfile", "d")
-	}
-
-}
-
-func TestIsExists(t *testing.T) {
-
-	testName := "testfile.txt"
-
-	file, err := os.OpenFile(testName, os.O_CREATE|os.O_EXCL, 0600)
-	if err != nil {
-		t.Fatalf("Failed to create %s: %s\n", testName, err)
-	}
-
-	err = file.Close()
-	if err != nil {
-		t.Fatalf("Failed to close %s: %s\n", testName, err)
-	}
-
-	ok, err := freax.IsPathExists(testName)
-	if err != nil {
-		t.Fatalf("FAIL: failed to check if exist: %s\n", err)
-	}
-
-	if !ok {
-		t.Fatalf("FAIL: %s should exists!\n", testName)
-	}
-
-	err = os.Remove(testName)
-	if err != nil {
-		t.Fatalf("Failed to remove %s: %s\n", testName, err)
-	}
-}
-
-func BenchmarkIsExistsTrue(b *testing.B) {
-
-	testName := "testfile.txt"
-
-	file, err := os.OpenFile(testName, os.O_CREATE|os.O_EXCL, 0600)
-	if err != nil {
-		b.Fatalf("Failed to create %s: %s\n", testName, err)
-	}
-
-	err = file.Close()
-	if err != nil {
-		b.Fatalf("Failed to close %s: %s\n", testName, err)
-	}
-
-	clean := func() {
-		err = os.Remove(testName)
+		f, err := freax.OpenFile("test.txt", freax.O_RDWR|os.O_CREATE, 0666)
 		if err != nil {
-			b.Fatalf("Failed to remove %s: %s\n", testName, err)
+			b.Fatalf("Open: %s\n", err)
 		}
+
+		n, err := f.Write(buf1)
+		if err != nil {
+			b.Fatalf("Write: %s\n", err)
+		}
+
+		if n != len(buf1) {
+			b.Fatalf("Write: bytes write: %d, should be %d\n", n, len(buf1))
+		}
+
+		_, err = f.Seek(0, os.SEEK_SET)
+		if err != nil {
+			b.Fatalf("Seek: %s\n", err)
+		}
+
+		n, err = f.Read(buf2)
+		if err != nil {
+			b.Fatalf("Read: %s\n", err)
+		}
+		if n != len(buf1) {
+			b.Fatalf("Read: bytes read: %d, should be %d\n", n, len(buf1))
+		}
+
+		if !bytes.Equal(buf1, buf2) {
+			b.Fatalf("Buf differs: %v / %v\n", buf1, buf2)
+		}
+
+		f.Close()
 	}
-	b.Cleanup(clean)
+}
+
+func BenchmarkOsFileReadWrite(b *testing.B) {
+
+	buf1 := []byte{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
+	buf2 := []byte{'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'}
+
+	b.Cleanup(func() { os.RemoveAll("test.txt") })
 
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		freax.IsPathExists(testName)
-	}
+		f, err := os.OpenFile("test.txt", freax.O_RDWR|os.O_CREATE, 0666)
+		if err != nil {
+			b.Fatalf("Open: %s\n", err)
+		}
 
+		n, err := f.Write(buf1)
+		if err != nil {
+			b.Fatalf("Write: %s\n", err)
+		}
+
+		if n != len(buf1) {
+			b.Fatalf("Write: bytes write: %d, should be %d\n", n, len(buf1))
+		}
+
+		_, err = f.Seek(0, os.SEEK_SET)
+		if err != nil {
+			b.Fatalf("Seek: %s\n", err)
+		}
+
+		n, err = f.Read(buf2)
+		if err != nil {
+			b.Fatalf("Read: %s\n", err)
+		}
+		if n != len(buf1) {
+			b.Fatalf("Read: bytes read: %d, should be %d\n", n, len(buf1))
+		}
+
+		if !bytes.Equal(buf1, buf2) {
+			b.Fatalf("Buf differs: %v / %v\n", buf1, buf2)
+		}
+
+		f.Close()
+	}
 }
 
-func BenchmarkIsExistsFalse(b *testing.B) {
+// func BenchmarkOpenFile(b *testing.B) {
 
-	testName := "testfile.txt"
+// 	for i := 0; i < b.N; i++ {
+// 		f, _ := freax.OpenFile("file.go", freax.O_RDONLY, 0)
+// 		f.Close()
+// 	}
+// }
 
-	b.ResetTimer()
+// func BenchmarkOsOpenFile(b *testing.B) {
 
-	for i := 0; i < b.N; i++ {
-		freax.IsPathExists(testName)
-	}
-
-}
+// 	for i := 0; i < b.N; i++ {
+// 		f, _ := os.OpenFile("file.go", os.O_RDONLY, 0)
+// 		f.Close()
+// 	}
+// }

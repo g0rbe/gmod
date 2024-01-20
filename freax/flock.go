@@ -2,17 +2,29 @@ package freax
 
 import (
 	"syscall"
+
+	"golang.org/x/sys/unix"
+)
+
+var (
+	F_RDLCK int16 = unix.F_RDLCK // Place a read lock on a file with FcntlFlock
+	F_WRLCK int16 = unix.F_WRLCK // Place a write lock on a file with FcntlFlock
+	F_UNLCK int16 = unix.F_UNLCK // Release the lock on a file with FcntlFlock
+)
+
+var (
+	F_SETLK  = unix.F_SETLK  // Acquire or release a lock
+	F_SETLKW = unix.F_SETLKW // As for F_SETLK, but if a conflicting lock is held on the file, then wait for that lock to be released
+	F_GETLK  = unix.F_GETLK  // Return details about the current lock
 )
 
 // FlockGetRead returns whether read lock (F_RDLCK) could be placed on fd.
+// Every byte will be checked for lock.
 func FlockGetRead(fd uintptr) (bool, error) {
 
 	flock := new(syscall.Flock_t)
 
-	flock.Type = syscall.F_RDLCK
-	flock.Whence = 0 // SEEK_SET, start of the file
-	flock.Start = 0  // Starting offset
-	flock.Len = 0    // Lock all bytes
+	flock.Type = F_RDLCK
 
 	err := syscall.FcntlFlock(fd, syscall.F_GETLK, flock)
 
@@ -20,46 +32,38 @@ func FlockGetRead(fd uintptr) (bool, error) {
 }
 
 // FlockGetRead returns whether write lock (F_WRLCK) could be placed on fd.
+// Every byte will be checked for lock.
 func FlockGetWrite(fd uintptr) (bool, error) {
 
 	flock := new(syscall.Flock_t)
 
 	flock.Type = syscall.F_WRLCK
-	flock.Whence = 0 // SEEK_SET, start of the file
-	flock.Start = 0  // Starting offset
-	flock.Len = 0    // Lock all bytes
 
 	err := syscall.FcntlFlock(fd, syscall.F_GETLK, flock)
 
 	return flock.Type == syscall.F_UNLCK, err
 }
 
-// FlockRead acquire the advisory record lock for read on fd.
+// FlockSetRead acquire the advisory record lock for read on fd.
 // This function returns error if a conflicting lock is held by another process.
 // In order to place a read lock, fd must be open for reading.
-func FlockRead(fd uintptr) error {
+func FlockSetRead(fd uintptr) error {
 
 	flock := new(syscall.Flock_t)
 
 	flock.Type = syscall.F_RDLCK
-	flock.Whence = 0 // SEEK_SET, start of the file
-	flock.Start = 0  // Starting offset
-	flock.Len = 0    // Lock all bytes
 
 	return syscall.FcntlFlock(fd, syscall.F_SETLK, flock)
 }
 
-// FlockWrite acquire the advisory record lock for write on fd.
+// FlockSetWrite acquire the advisory record lock for write on fd.
 // This function returns error if a conflicting lock is held by another process.
 // In order to place a write lock, fd must be open for writing.
-func FlockWrite(fd uintptr) error {
+func FlockSetWrite(fd uintptr) error {
 
 	flock := new(syscall.Flock_t)
 
 	flock.Type = syscall.F_WRLCK
-	flock.Whence = 0 // SEEK_SET, start of the file
-	flock.Start = 0  // Starting offset
-	flock.Len = 0    // Lock all bytes
 
 	return syscall.FcntlFlock(fd, syscall.F_SETLK, flock)
 }
@@ -71,39 +75,30 @@ func FlockUnlock(fd uintptr) error {
 	flock := new(syscall.Flock_t)
 
 	flock.Type = syscall.F_UNLCK
-	flock.Whence = 0 // SEEK_SET, start of the file
-	flock.Start = 0  // Starting offset
-	flock.Len = 0    // Lock all bytes
 
 	return syscall.FcntlFlock(fd, syscall.F_SETLK, flock)
 }
 
-// FlockReadWait acquire the advisory record lock for read on fd.
+// FlockSetReadWait acquire the advisory record lock for read on fd.
 // If a conflicting lock is held on the file, then wait for that lock to be released.
 // In order to place a read lock, fd must be open for reading.
-func FlockReadWait(fd uintptr) error {
+func FlockSetReadWait(fd uintptr) error {
 
 	flock := new(syscall.Flock_t)
 
 	flock.Type = syscall.F_RDLCK
-	flock.Whence = 0 // SEEK_SET, start of the file
-	flock.Start = 0  // Starting offset
-	flock.Len = 0    // Lock all bytes
 
 	return syscall.FcntlFlock(fd, syscall.F_SETLKW, flock)
 }
 
-// FlockWriteWait acquire the advisory record lock for write on fd.
+// FlockSetWriteWait acquire the advisory record lock for write on fd.
 // If a conflicting lock is held on the file, then wait for that lock to be released.
 // In order to place a write lock, fd must be open for writing.
-func FlockWriteWait(fd uintptr) error {
+func FlockSetWriteWait(fd uintptr) error {
 
 	flock := new(syscall.Flock_t)
 
 	flock.Type = syscall.F_WRLCK
-	flock.Whence = 0 // SEEK_SET, start of the file
-	flock.Start = 0  // Starting offset
-	flock.Len = 0    // Lock all bytes
 
 	return syscall.FcntlFlock(fd, syscall.F_SETLKW, flock)
 }
@@ -115,9 +110,6 @@ func FlockUnlockWait(fd uintptr) error {
 	flock := new(syscall.Flock_t)
 
 	flock.Type = syscall.F_UNLCK
-	flock.Whence = 0 // SEEK_SET, start of the file
-	flock.Start = 0  // Starting offset
-	flock.Len = 0    // Lock all bytes
 
 	return syscall.FcntlFlock(fd, syscall.F_SETLKW, flock)
 }
