@@ -16,3 +16,43 @@ Or get the latest commit (if Go module proxy is not updated):
 ```bash
 go get "github.com/g0rbe/gmod@$(curl -s 'https://api.github.com/repos/g0rbe/gmod/commits' | jq -r '.[0].sha')"
 ```
+
+## Structure
+
+```
+├── clock
+├── cryptography
+│   ├── checksum
+│   └── random
+├── freax
+├── inout
+│   ├── colorz
+│   ├── dntfy
+│   ├── logz
+│   └── pinentry
+├── net
+│   ├── arp
+│   ├── blocklist
+│   ├── capability
+│   ├── ctlog
+│   ├── dns
+│   │   └── hetzner
+│   ├── iface
+│   ├── ip
+│   ├── portscan
+│   ├── raw
+│   ├── route
+│   ├── tcp
+│   ├── tls
+│   │   ├── certificate
+│   │   ├── ciphersuite
+│   │   │   └── tools
+│   │   ├── ssl30
+│   │   ├── tls10
+│   │   ├── tls11
+│   │   ├── tls12
+│   │   └── tls13
+│   └── validator
+├── octets
+└── slicer
+```
