@@ -1,4 +1,3 @@
-// Manage PID files
 package freax
 
 import (
